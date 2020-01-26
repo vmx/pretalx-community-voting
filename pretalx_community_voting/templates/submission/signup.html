@@ -1,0 +1,9 @@
+<h1>Community voting signup</h1>
+
+<p>Please enter your email address:</p>
+
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Sign up">
+</form>
+
