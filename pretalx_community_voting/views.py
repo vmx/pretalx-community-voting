@@ -11,12 +11,13 @@ from .forms import SignupForm
 
 
 class SignupView(FormView):
-    template_name = 'submission/signup.html'
+    template_name = "submission/signup.html"
     form_class = SignupForm
 
     def get_success_url(self):
-        return reverse('plugins:pretalx_community_voting:thanks',
-                       kwargs=self.kwargs)
+        return reverse(
+            "plugins:pretalx_community_voting:thanks", kwargs=self.kwargs
+        )
 
     def form_valid(self, form):
         form.send_email()
@@ -29,10 +30,10 @@ class ThanksView(TemplateView):
 
 class SubmissionListView(ListView):
     model = Submission
-    template_name = 'submission/submission_list.html'
+    template_name = "submission/submission_list.html"
 
     def get_queryset(self):
         submissions = list(Submission.objects.all())
-        random.seed('abcd')
+        random.seed("abcd")
         random.shuffle(submissions)
         return submissions
