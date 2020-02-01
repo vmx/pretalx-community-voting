@@ -1,8 +1,12 @@
 <h1>Community voting</h1>
-<ul>
-{% for submission in object_list %}
-    <li>{{ submission.title }}</li>
-{% empty %}
-    <li>No submissions yet.</li>
-{% endfor %}
-</ul>
+{% if valid_user %}
+    <ul>
+    {% for submission in object_list %}
+        <li>{{ submission.title }}</li>
+    {% empty %}
+        <li>No submissions yet.</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Invalid URL. Please double check that it is correct.</p>
+{% endif %}
