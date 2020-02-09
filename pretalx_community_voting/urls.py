@@ -16,8 +16,8 @@ urlpatterns = [
         name="thanks",
     ),
     url(
-        f"^(?P<event>[{SLUG_CHARS}]+)/p/voting/vote/(?P<signed_user>[^/]+)/$",
+        f"^(?P<event>[{SLUG_CHARS}]+)/p/voting/talks/(?P<signed_user>[^/]+)/$",
         views.SubmissionListView.as_view(),
-        name="vote",
+        name="talks",
     ),
 ]

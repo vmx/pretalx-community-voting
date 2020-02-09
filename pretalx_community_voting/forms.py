@@ -30,7 +30,7 @@ class SignupForm(forms.Form):
         email_signed = signer.sign(email_hashed)
 
         vote_url = build_absolute_uri(
-            "plugins:pretalx_community_voting:vote",
+            "plugins:pretalx_community_voting:talks",
             kwargs={"event": event.slug, "signed_user": email_signed},
         )
         print(f"vote_url: {vote_url}")
