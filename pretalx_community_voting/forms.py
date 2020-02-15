@@ -1,6 +1,8 @@
 from hashlib import blake2b
 
 from django import forms
+from django.forms import ValidationError
+from django.core import signing
 from django.core.signing import Signer
 from django.core.validators import RegexValidator
 
@@ -51,5 +53,24 @@ class ApiValidationForm(forms.Form):
         ],
     )
     score = forms.IntegerField(required=True, min_value=0, max_value=2)
-    # TODO vmx 2020-02-09 add proper validator for signed username
     user = forms.CharField(required=True)
+
+    def __init__(self, event, data, **kwargs):
+        """Custom constructor as we need the event for validation."""
+        super(ApiValidationForm, self).__init__(data, **kwargs)
+        self.event = event
+
+    def clean_user(self):
+        """Validate the signature of the user."""
+        signed_user = self.cleaned_data["user"]
+
+        # TODO vmx 2020-02-15: Move the email signing etc into its own class
+        # so that it can be used from views and forms using the same signer
+        signer = Signer(salt=self.event)
+        try:
+            user = signer.unsign(signed_user)
+        except signing.BadSignature:
+            # TODO vmx 2020-02-15: Use gettext for error message
+            raise ValidationError("Invalid user")
+
+        return user

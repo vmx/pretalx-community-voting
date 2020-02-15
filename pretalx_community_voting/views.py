@@ -61,7 +61,7 @@ class SubmissionListView(ListView):
 
 class ApiView(View):
     def post(self, request, event):
-        vote_data = ApiValidationForm(request.POST)
+        vote_data = ApiValidationForm(event, request.POST)
         if not vote_data.is_valid():
             return JsonResponse({"error": "Invalid data."}, status=500)
 
