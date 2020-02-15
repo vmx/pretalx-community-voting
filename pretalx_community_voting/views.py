@@ -11,7 +11,7 @@ from django.views.generic.list import ListView
 
 from pretalx.submission.models import Submission
 
-from .forms import SignupForm, ApiValidationForm
+from .forms import SignupForm, ApiValidationFormGet, ApiValidationFormPost
 from .models import Vote
 
 
@@ -60,14 +60,52 @@ class SubmissionListView(ListView):
 
 
 class ApiView(View):
-    def post(self, request, event):
-        vote_data = ApiValidationForm(event, request.POST)
+    # TODO vmx 2020-02-15: Unify this code with the one from the POST request
+    def get(self, request, event):
+        vote_data = ApiValidationFormGet(event, request.GET)
         if not vote_data.is_valid():
             return JsonResponse({"error": "Invalid data."}, status=500)
 
-        submission = Submission.objects.get(
-            event=request.event, code=vote_data.cleaned_data["submission"]
-        )
+        try:
+            submission = Submission.objects.get(
+                event=request.event, code=vote_data.cleaned_data["submission"]
+            )
+        except Submission.DoesNotExist:
+            return JsonResponse(
+                {
+                    "error": "Submission not found.",
+                    "submission": vote_data.cleaned_data["submission"],
+                },
+                status=404,
+            )
+        try:
+            vote = Vote.objects.get(
+                user=vote_data.cleaned_data["user"], submission=submission
+            )
+        except Vote.DoesNotExist:
+            return JsonResponse({"error": "Not voted yet."}, status=404)
+
+        response = {"score": vote.score, "submission": vote.submission.code}
+        return JsonResponse(response)
+
+    def post(self, request, event):
+        vote_data = ApiValidationFormPost(event, request.POST)
+        if not vote_data.is_valid():
+            # TODO vmx 2020-02-15: Return better error messages
+            return JsonResponse({"error": "Invalid data."}, status=500)
+
+        try:
+            submission = Submission.objects.get(
+                event=request.event, code=vote_data.cleaned_data["submission"]
+            )
+        except Submission.DoesNotExist:
+            return JsonResponse(
+                {
+                    "error": "Submission not found.",
+                    "submission": vote_data.cleaned_data["submission"],
+                },
+                status=404,
+            )
         try:
             # Update any existing vote
             vote = Vote.objects.get(

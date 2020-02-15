@@ -39,8 +39,8 @@ class SignupForm(forms.Form):
         print(f"vote_url: {vote_url}")
 
 
-class ApiValidationForm(forms.Form):
-    """This form is only used for validating POST parameters."""
+class ApiValidationFormGet(forms.Form):
+    """This form is only used for validating GET parameters."""
 
     submission = forms.CharField(
         required=True,
@@ -52,12 +52,12 @@ class ApiValidationForm(forms.Form):
             )
         ],
     )
-    score = forms.IntegerField(required=True, min_value=0, max_value=2)
+    score = forms.IntegerField(required=False, min_value=0, max_value=2)
     user = forms.CharField(required=True)
 
     def __init__(self, event, data, **kwargs):
         """Custom constructor as we need the event for validation."""
-        super(ApiValidationForm, self).__init__(data, **kwargs)
+        super(ApiValidationFormGet, self).__init__(data, **kwargs)
         self.event = event
 
     def clean_user(self):
@@ -74,3 +74,13 @@ class ApiValidationForm(forms.Form):
             raise ValidationError("Invalid user")
 
         return user
+
+
+class ApiValidationFormPost(ApiValidationFormGet):
+    """This form is only used for validating POST parameters.
+
+    It has the same constraints as for getting a value, the only difference
+    is that you need to provide a score.
+    """
+
+    score = forms.IntegerField(required=True, min_value=0, max_value=2)
