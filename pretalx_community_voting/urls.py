@@ -20,4 +20,9 @@ urlpatterns = [
         views.SubmissionListView.as_view(),
         name="talks",
     ),
+    url(
+        f"^(?P<event>[{SLUG_CHARS}]+)/p/voting/api/$",
+        views.ApiView.as_view(),
+        name="api",
+    ),
 ]

@@ -2,14 +2,17 @@ import random
 
 from django.core import signing
 from django.core.signing import Signer
+from django.http import JsonResponse
 from django.urls import reverse
+from django.views import View
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
 from pretalx.submission.models import Submission
 
-from .forms import SignupForm
+from .forms import SignupForm, ApiValidationForm
+from .models import Vote
 
 
 class SignupView(FormView):
@@ -54,3 +57,31 @@ class SubmissionListView(ListView):
             context["valid_user"] = False
 
         return context
+
+
+class ApiView(View):
+    def post(self, request, event):
+        vote_data = ApiValidationForm(request.POST)
+        if not vote_data.is_valid():
+            return JsonResponse({"error": "Invalid data."}, status=500)
+
+        submission = Submission.objects.get(
+            event=request.event, code=vote_data.cleaned_data["submission"]
+        )
+        try:
+            # Update any existing vote
+            vote = Vote.objects.get(
+                user=vote_data.cleaned_data["user"], submission=submission
+            )
+            vote.score = vote_data.cleaned_data["score"]
+        except Vote.DoesNotExist:
+            # If the user hasn't voted yet, create a new vote
+            vote = Vote(
+                score=vote_data.cleaned_data["score"],
+                user=vote_data.cleaned_data["user"],
+                submission=submission,
+            )
+        vote.save()
+
+        response = {"score": vote.score, "submission": vote.submission.code}
+        return JsonResponse(response)

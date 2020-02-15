@@ -2,6 +2,7 @@ from hashlib import blake2b
 
 from django import forms
 from django.core.signing import Signer
+from django.core.validators import RegexValidator
 
 from pretalx.common.urls import build_absolute_uri
 
@@ -34,3 +35,21 @@ class SignupForm(forms.Form):
             kwargs={"event": event.slug, "signed_user": email_signed},
         )
         print(f"vote_url: {vote_url}")
+
+
+class ApiValidationForm(forms.Form):
+    """This form is only used for validating POST parameters."""
+
+    submission = forms.CharField(
+        required=True,
+        max_length=16,
+        validators=[
+            RegexValidator(
+                regex=r"^[0-9a-zA-Z]*$",
+                message="Submission code may only contain alphanumeric characters.",
+            )
+        ],
+    )
+    score = forms.IntegerField(required=True, min_value=0, max_value=2)
+    # TODO vmx 2020-02-09 add proper validator for signed username
+    user = forms.CharField(required=True)
