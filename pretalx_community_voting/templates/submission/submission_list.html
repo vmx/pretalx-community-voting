@@ -1,8 +1,17 @@
+{% load static %}
+<script src="{% static "vendored/jquery-3.1.1.js" %}"></script>
+<script src="{% static "pretalx_community_voting/vote.js" %}"></script>
+
 <h1>Community voting</h1>
 {% if valid_user %}
     <ul>
     {% for submission in object_list %}
-        <li>{{ submission.title }}</li>
+        <li>
+          <input type="radio" name="{{ submission.code }}" value="0" />
+          <input type="radio" name="{{ submission.code }}" value="1" />
+          <input type="radio" name="{{ submission.code }}" value="2" />
+          <h3>{{ submission.title }}</h3>
+        </li>
     {% empty %}
         <li>No submissions yet.</li>
     {% endfor %}
