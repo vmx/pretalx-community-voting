@@ -1,21 +1,30 @@
 {% load static %}
 <script src="{% static "vendored/jquery-3.1.1.js" %}"></script>
 <script src="{% static "pretalx_community_voting/vote.js" %}"></script>
+<link rel="stylesheet" href="{% static "pretalx_community_voting/vote.css" %}" />
 
 <h1>Community voting</h1>
 {% if valid_user %}
-    <ul>
     {% for submission in object_list %}
-        <li>
-          <input type="radio" name="{{ submission.code }}" value="0" />
-          <input type="radio" name="{{ submission.code }}" value="1" />
-          <input type="radio" name="{{ submission.code }}" value="2" />
-          <h3>{{ submission.title }}</h3>
-        </li>
+        <article>
+            <header>
+                <form>
+                    <label>0
+                        <input type="radio" name="{{ submission.code }}" value="0" />
+                    </label>
+                    <label>1
+                        <input type="radio" name="{{ submission.code }}" value="1" />
+                    </label>
+                    <label>2
+                        <input type="radio" name="{{ submission.code }}" value="2" />
+                    </label>
+                </form>
+                <h3>{{ submission.title }}</h3>
+            </header>
+        </article>
     {% empty %}
-        <li>No submissions yet.</li>
+        <p>No submissions yet.</p>
     {% endfor %}
-    </ul>
 {% else %}
     <p>Invalid URL. Please double check that it is correct.</p>
 {% endif %}
