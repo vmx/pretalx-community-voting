@@ -1,3 +1,4 @@
+{% load rich_text %}
 {% load static %}
 <script src="{% static "vendored/jquery-3.1.1.js" %}"></script>
 <script src="{% static "pretalx_community_voting/vote.js" %}"></script>
@@ -21,6 +22,7 @@
                 </form>
                 <h3>{{ submission.title }}</h3>
             </header>
+            {{ submission.abstract|rich_text|default:'-' }}
         </article>
     {% empty %}
         <p>No submissions yet.</p>
