@@ -1,6 +1,8 @@
 'use strict'
 
 $(() => {
+  const csrftoken = getCookie("pretalx_csrftoken")
+
   // Get the user from the URL. The user needs to be the last element of the
   // URL. Trailing slashes are ignored
   let user
@@ -45,6 +47,9 @@ $(() => {
       },
       type: 'POST',
       dataType: 'json',
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
     }).done((json) => {
       // Select the checkbox based on the POST response
       $(`input[name=${json.submission}]`)
@@ -62,3 +67,20 @@ $(() => {
     })
   })
 })
+
+// From https://docs.djangoproject.com/en/3.0/ref/csrf/
+const getCookie = (name) => {
+  let cookieValue = null
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';')
+    for (const i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim()
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+        break
+      }
+    }
+  }
+  return cookieValue;
+}
