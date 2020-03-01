@@ -3,6 +3,7 @@ from hashlib import blake2b
 from django import forms
 from django.forms import ValidationError
 from django.core import signing
+from django.core.mail import send_mail
 from django.core.signing import Signer
 from django.core.validators import RegexValidator
 
@@ -17,8 +18,6 @@ class SignupForm(forms.Form):
 
         :param event: The current event is used as salt
         """
-        print(f'sending the email to {self.cleaned_data["email"]}')
-
         # Use the hashed email as identifier for the votes
         email_hashed = blake2b(
             self.cleaned_data["email"].encode("utf-8"),
@@ -36,7 +35,16 @@ class SignupForm(forms.Form):
             "plugins:pretalx_community_voting:talks",
             kwargs={"event": event.slug, "signed_user": email_signed},
         )
-        print(f"vote_url: {vote_url}")
+
+        # TODO vmx 2020-03-01: Make the email a proper template and use
+        # pretalx code for it
+        send_mail(
+            "Community voting test",
+            f"This is still in development, but please try voting at {vote_url}",
+            "vmx7@uber.space",
+            [self.cleaned_data["email"]],
+            fail_silently=False,
+        )
 
 
 class ApiValidationFormGet(forms.Form):
