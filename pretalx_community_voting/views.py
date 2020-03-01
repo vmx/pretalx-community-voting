@@ -59,7 +59,7 @@ class SubmissionListView(ListView):
         submissions = list(
             Submission.objects.all().annotate(score=Subquery(votes))
         )
-        random.seed("abcd")
+        random.seed(self.user)
         random.shuffle(submissions)
         return submissions
 
