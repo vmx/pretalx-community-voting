@@ -2,6 +2,7 @@ import random
 
 from django.core import signing
 from django.core.signing import Signer
+from django.db.models import OuterRef, Subquery
 from django.http import JsonResponse
 from django.urls import reverse
 from django.views import View
@@ -37,24 +38,31 @@ class SubmissionListView(ListView):
     model = Submission
     template_name = "submission/submission_list.html"
 
+    # If the user is unvalid, it will stay "None"
+    user = None
+
     def get_queryset(self):
-        submissions = list(Submission.objects.all())
+        # TODO vmx 2020-02-02: Move the email signing etc into its own class
+        # so that it can be used from views and forms using the same signer
+        signer = Signer(salt=self.kwargs["event"])
+        try:
+            self.user = signer.unsign(self.kwargs["signed_user"])
+        except signing.BadSignature:
+            self.user = None
+
+        votes = Vote.objects.filter(
+            user=self.user, submission_id=OuterRef("pk")
+        ).values("score")
+        submissions = list(
+            Submission.objects.all().annotate(score=Subquery(votes))
+        )
         random.seed("abcd")
         random.shuffle(submissions)
         return submissions
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # TODO vmx 2020-02-02: Move the email signing etc into its own class
-        # so that it can be used from views and forms using the same signer
-        signer = Signer(salt=self.kwargs["event"])
-        try:
-            user = signer.unsign(self.kwargs["signed_user"])
-            context["user"] = user
-        except signing.BadSignature:
-            context["user"] = None
-
+        context["user"] = self.user
         return context
 
 

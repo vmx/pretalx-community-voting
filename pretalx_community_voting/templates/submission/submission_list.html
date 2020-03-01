@@ -10,14 +10,20 @@
         <article>
             <header>
                 <form>
-                    <label>0
-                        <input type="radio" name="{{ submission.code }}" value="0" />
+                    <label {% if submission.score == 0 %}class="selected"{% endif %}>
+                        0
+                        <input type="radio" name="{{ submission.code }}" value="0"
+                            {% if submission.score == 0 %}checked="checked"{% endif %} />
                     </label>
-                    <label>1
-                        <input type="radio" name="{{ submission.code }}" value="1" />
+                    <label {% if submission.score == 1 %}class="selected"{% endif %}>
+                        1
+                        <input type="radio" name="{{ submission.code }}" value="1"
+                            {% if submission.score == 1 %}checked="checked"{% endif %} />
                     </label>
-                    <label>2
-                        <input type="radio" name="{{ submission.code }}" value="2" />
+                    <label {% if submission.score == 2 %}class="selected"{% endif %}>
+                        2
+                        <input type="radio" name="{{ submission.code }}" value="2"
+                            {% if submission.score == 2 %}checked="checked"{% endif %} />
                     </label>
                 </form>
                 <h3>{{ submission.title }}</h3>
