@@ -49,6 +49,9 @@ class SubmissionListView(ListView):
             self.user = signer.unsign(self.kwargs["signed_user"])
         except signing.BadSignature:
             self.user = None
+            # If the use wasn't valid, there is no point of returning a
+            # QuerySet with the talks
+            return None
 
         votes = Vote.objects.filter(
             user=self.user, submission_id=OuterRef("pk")
