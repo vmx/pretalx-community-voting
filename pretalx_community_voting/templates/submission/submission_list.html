@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{% static "pretalx_community_voting/vote.css" %}" />
 
 <h1>Community voting</h1>
-{% if valid_user %}
+{% if user %}
     {% for submission in object_list %}
         <article>
             <header>

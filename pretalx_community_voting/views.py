@@ -52,9 +52,8 @@ class SubmissionListView(ListView):
         try:
             user = signer.unsign(self.kwargs["signed_user"])
             context["user"] = user
-            context["valid_user"] = True
         except signing.BadSignature:
-            context["valid_user"] = False
+            context["user"] = None
 
         return context
 
